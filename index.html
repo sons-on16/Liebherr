@@ -158,7 +158,7 @@
   </section>
 
   <main><div class="wrap"><div class="grid" id="grid"></div></div></main>
-  <footer><div class="wrap">Client Launcher Liebherr v3.3</div></footer>
+  <footer><div class="wrap">Client Launcher Liebherr v3.5</div></footer>
 
 <script>
   /* ============================================================
@@ -183,9 +183,9 @@
     apps: [
       { name: "MyLiebherr",      icon: "👤", image: ML_ICON, type: "web", link: "https://my.liebherr.com/" },
       { name: "LiDAT SmartApp",  icon: "📡", image: LI_ICON, type: "web", link: "https://smartapp.liebherr.com/index.html?launcher=true" },
-      { name: "Part Assistant",  icon: "🔧", image: PA_ICON, type: "app", link: "com.liebherr.ldc.mcc.partsassist" },
+      { name: "Part Assistant",  icon: "🔧", image: PA_ICON, type: "app", link: "com.liebherr.ldc.mcc.partsassist", scheme: "com.liebherr.ldc.partsassist", fallback: "https://partsassistant.liebherr.com/#/select-machine" },
       { name: "CP mobile",           icon: "🏗️", image: CP_ICON, type: "web", link: "https://mobile.craneplanner.com/" },
-      { name: "Liebherr XpertAssist", icon: "🎧", image: XA_ICON, type: "app", link: "de.oculavis.liebherr.mobile" }
+      { name: "Liebherr XpertAssist", icon: "🎧", image: XA_ICON, type: "app", link: "de.oculavis.liebherr.mobile", host: "xpertassist.liebherr.com" }
     ]
   };
 
@@ -218,8 +218,12 @@
       tile.rel = "noopener";
     } else {
       // Opens the installed app; if it isn't installed, falls back to its Play Store page
-      const store = "https://play.google.com/store/apps/details?id=" + app.link;
-      tile.href = "intent://#Intent;package=" + app.link +
+      const store = app.fallback || ("https://play.google.com/store/apps/details?id=" + app.link);
+      // With a host: use the app's registered web link (Chrome only opens apps via links they accept)
+      tile.href = (app.host ? "intent://" + app.host + "/#Intent;scheme=https;"
+                 : app.scheme ? "intent://#Intent;scheme=" + app.scheme + ";"
+                 : "intent://#Intent;") +
+                  "package=" + app.link +
                   ";S.browser_fallback_url=" + encodeURIComponent(store) + ";end";
     }
     grid.appendChild(tile);
